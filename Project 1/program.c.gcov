@@ -1,0 +1,140 @@
+        -:    0:Source:program.c
+        -:    0:Graph:program.gcno
+        -:    0:Data:program.gcda
+        -:    0:Runs:18
+        -:    0:Programs:1
+        -:    1:/*----------------------------------------------------------------------------
+        -:    2: Note: the code in this file is not to be shared with anyone or posted online.
+        -:    3: (c) Adam Doupe, 2016
+        -:    4: ----------------------------------------------------------------------------*/
+        -:    5:#include <stdio.h>
+        -:    6:#include <stdlib.h>
+        -:    7:#include <string.h>
+        -:    8:#include <ctype.h>
+        -:    9:
+       55:   10:void skip_space()
+        -:   11:{
+       55:   12:   int done = 0;
+       55:   13:   int is_eof = 0;
+        -:   14:   char c;
+        -:   15:
+      199:   16:   while (!done)
+        -:   17:   {
+       89:   18:	  c = getc(stdin);
+       89:   19:	  is_eof = feof(stdin);
+       89:   20:	  done = is_eof || !isspace(c);
+        -:   21:   }
+       55:   22:   if (!is_eof)
+        -:   23:   {
+        -:   24:	  // Put the character back in the input stream if it is not EOF
+       43:   25:	  ungetc(c, stdin);
+        -:   26:   }
+       55:   27:}
+        -:   28:
+       40:   29:char* parse_word()
+        -:   30:{
+       40:   31:   int i = 0;
+       40:   32:   int max_size = 10;
+       40:   33:   int done = 0;
+       40:   34:   char* str = NULL;
+        -:   35:
+       40:   36:   str = malloc(max_size * sizeof(char));
+      334:   37:   while (!done)
+        -:   38:   {
+        -:   39:	  char c;
+      254:   40:	  c = getc(stdin);
+      254:   41:	  if (isspace(c))
+        -:   42:	  {
+       40:   43:		 done = 1;
+       40:   44:		 ungetc(c, stdin);
+        -:   45:	  }
+        -:   46:	  else
+        -:   47:	  {
+      214:   48:		 str[i] = c;
+      214:   49:		 i++;
+      214:   50:		 if (i == max_size)
+        -:   51:		 {
+        3:   52:			max_size = max_size + 10;
+        3:   53:			str = realloc(str, max_size);
+        -:   54:		 }
+        -:   55:	  }
+        -:   56:   }
+       40:   57:   str[i] = '\0';
+       40:   58:   return str;
+        -:   59:}
+        -:   60:
+       18:   61:int parse_input()
+        -:   62:{
+       18:   63:   int count = 0;
+       18:   64:   int done = 0;
+       18:   65:   int num = 0;
+        -:   66:
+       79:   67:   while (!done)
+        -:   68:   {
+        -:   69:	  char c;
+       55:   70:	  num += 1;
+       55:   71:	  skip_space();
+       55:   72:	  c = getc(stdin);
+       55:   73:	  if (feof(stdin))
+        -:   74:	  {
+       12:   75:		 if (count == 0 && num > 1)
+        -:   76:		 {
+       11:   77:			return 1;
+        -:   78:		 }
+        -:   79:		 else
+        -:   80:		 {
+        1:   81:			return -42;
+        -:   82:		 }
+        -:   83:	  }
+        -:   84:
+       43:   85:	  if (c == '(')
+        -:   86:	  {
+        3:   87:		 count += 1;
+        -:   88:	  }
+       40:   89:	  else if (c == ')')
+        -:   90:	  {
+    #####:   91:		 count -= 1;
+        -:   92:	  }
+        -:   93:	  else
+        -:   94:	  {
+        -:   95:		 char* word;
+       40:   96:		 ungetc(c, stdin);
+       40:   97:		 word = parse_word();
+       40:   98:		 if (strcmp(word, "END") == 0)
+        -:   99:		 {
+        4:  100:			done = 1;
+        -:  101:		 }
+       36:  102:		 else if (strcmp(word, "NEGATE") == 0)
+        -:  103:		 {
+        7:  104:			count = count * -1;
+        -:  105:		 }
+       40:  106:		 free(word);
+        -:  107:	  }
+       43:  108:	  if (count < 0)
+        -:  109:	  {
+        2:  110:		 done = 1;
+        -:  111:	  }
+        -:  112:   }
+        6:  113:   return abs(count);
+        -:  114:}
+        -:  115:
+       18:  116:int main(int argc, char** argv)
+        -:  117:{
+        -:  118:   int result;
+        -:  119:
+       18:  120:   result = parse_input();
+        -:  121:
+       18:  122:   if (result == 0)
+        -:  123:   {
+        4:  124:	  printf("Success!\n");
+        -:  125:   }
+       14:  126:   else if (result > 0)
+        -:  127:   {
+       13:  128:	  printf("Error in input\n");
+        -:  129:   }
+        -:  130:   else
+        -:  131:   {
+        1:  132:	  printf("I've made a huge mistake\n");
+        -:  133:   }
+       18:  134:   return 0;
+        -:  135:}
