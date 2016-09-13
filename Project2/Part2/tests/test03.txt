@@ -1,0 +1,7 @@
+*()++ == <= >
+
+hello IF while CSE340
+
+>> +-* <<
+
+no output should be seen from this test case

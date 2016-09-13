@@ -1,0 +1,56 @@
+--- buggy_program.c	2016-09-09 23:29:38.295844544 -0700
++++ fixed_program.c	2016-09-09 23:29:28.466804868 -0700
+@@ -85,11 +85,12 @@
+ 	  else if (feof(stdin))
+ 	  {
+ 		 done = 1;
++	     return head;
+ 	  }
+ 	  else
+ 	  {
+ 		 cur = malloc(sizeof(struct entry));
+-		 cur->name = input;
++         cur->name = strdup(input);
+ 		 cur->next = NULL;
+ 
+ 		 skip_space();
+@@ -123,6 +123,12 @@
+ 			{
+ 			   head = cur;
+ 			}
++			else if (prev == NULL)
++			{
++			    head->next = cur; //Because if the previous item doesn't exist,
++			                      //then "head" must be the only item
++			    prev = cur;
++			}
+ 			else
+ 			{
+ 			   prev->next = cur;
+@@ -134,7 +140,7 @@
+    }
+ 
+    // head points to the start of the list
+-   return head->next;
++   return head;
+ }
+ 
+ int compare_entries(const void* f, const void* s)
+@@ -147,7 +153,7 @@
+    to_return = strcmp(first->name, second->name);
+    if (to_return == 0)
+    {
+-	  to_return = second->amount - first->amount;
++	  to_return = first->amount - second->amount;
+    }
+    return to_return;
+ }
+@@ -212,7 +218,7 @@
+ 
+    head = parse_input();
+ 
+-   if (head = NULL)
++   if (head == NULL)
+    {
+ 	  printf("Error, no input received.\n");
+ 	  return -1;
